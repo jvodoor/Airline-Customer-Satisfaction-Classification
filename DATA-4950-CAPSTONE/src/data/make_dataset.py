@@ -3,15 +3,19 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+import pandas as pd
 
-
-@click.command()
+# this goes in main as arguments: '''input_filepath, output_filepath'''
+#the 3 below just need to be uncommented, don't move them
+'''@click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
+@click.argument('output_filepath', type=click.Path())'''
+def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
+    data = pd.read_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/DATA-4950-CAPSTONE/data/external/train.csv")
+    data.head()
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
