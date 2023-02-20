@@ -15,7 +15,8 @@ def main():
         cleaned data ready to be analyzed (saved in ../processed).
     """
     data = pd.read_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/DATA-4950-CAPSTONE/data/external/train.csv")
-    data.head()
+    print(data.head())
+    print(data.info(verbose = 0))
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
