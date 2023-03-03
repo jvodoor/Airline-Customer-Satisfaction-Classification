@@ -37,7 +37,7 @@ print_df_preliminary_contents(df_old_test)
 df = merge_data(df_old_train,df_old_test)
 print_df_preliminary_contents(df)
 
-#dropped nulls for our first pass of a cleaned up dataset
+#dropped nulls for our first pass of a cleaned up data set
 df = df.dropna()
 print_df_preliminary_contents(df)
 df.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
