@@ -1,6 +1,5 @@
 import sys
 sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/data/')
-sys.path.append("../src")
 import make_dataset as md
 import pandas as pd
 import numpy as np
@@ -14,7 +13,50 @@ from lazypredict.Supervised import LazyClassifier
 from lazypredict.Supervised import LazyRegressor
 import matplotlib.pyplot as plt
 
-df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/df feat eng done.csv")
+df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
+
+def log_reg_train(X_train, X_test, y_train, y_test):
+    # fit initial model
+    logistic = LogisticRegression(max_iter = 10000, random_state = 21)
+    logistic.fit(X_train, y_train)
+
+    # predict on the training data
+    log_pred_train = logistic.predict(X_train)
+
+    # display the inital model scores for training data
+    accuracy_training = logistic.score(X_train, y_train)
+
+    # display confusion matrix for training data
+    print("Logistic Regression Model Training Data Confusion Matrix :")
+    print(confusion_matrix(y_train, log_pred_train), "\n") 
+    print('The accuracy score for the training data is:', accuracy_training.round(3), "\n")
+    return logistic
+
+def extract_coefs(logistic):
+    log_intercept = logistic.intercept_ 
+    beta_0 = log_intercept
+
+    # extract log reg coefs
+    coef = logistic.coef_[0]
+    coef = np.array(coef)
+    df_coef = pd.DataFrame(coef)
+    df_coef = df_coef.T # transpose to match column names
+
+    # column names
+    names = X.columns
+    df_coef.columns = names
+    df_coef = df_coef.T # transpose for better view
+
+    # sort coefficients in ascending order
+    df_coef = df_coef.rename(columns = {0:'logregCV_coeff'})
+    df_coef = df_coef.sort_values('logregCV_coeff')
+    df_coef = df_coef.reset_index()
+    df_coef = df_coef.rename(columns = {'index':'Variable_Names', 'logreg_coeff':'logregCV_coeff'})
+    print("Coefficient importance for Logistic Regression:", "\n")
+    print(df_coef)
+    print ("\n")
+    return df_coef
+
 
 X, y = md.x_y_split(df_train, -1)
 
@@ -24,86 +66,21 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 #will functionalize the below code 
 
-# fit initial model
-logistic = LogisticRegression(max_iter = 10000, random_state = 21)
-logistic.fit(X_train, y_train)
+logistic_model = log_reg_train(X_train, X_test, y_train, y_test)
 
-# predict on the training data
-log_pred_train = logistic.predict(X_train)
-log_pred_test = logistic.predict(X_test)
-
-# display the inital model scores for training data
-accuracy_training = logistic.score(X_train, y_train)
-accuracy_testing = logistic.score(X_test, y_test)
-
-# display confusion matrix for training data
-print("Logistic Regression Model Training Data Confusion Matrix :")
-print(confusion_matrix(y_train, log_pred_train)) 
-print('The accuracy score for the training data is:', accuracy_training.round(3), "\n")
+df_coef = extract_coefs(logistic_model)
 
 
-log_intercept = logistic.intercept_ 
-beta_0 = log_intercept
-
-# extract log reg coefs
-coef = logistic.coef_[0]
-coef = np.array(coef)
-df_coef = pd.DataFrame(coef)
-df_coef = df_coef.T # transpose to match column names
-
-# column names
-names = X.columns
-df_coef.columns = names
-df_coef = df_coef.T # transpose for better view
-
-# sort coefficients in ascending order
-df_coef = df_coef.rename(columns = {0:'logregCV_coeff'})
-df_coef = df_coef.sort_values('logregCV_coeff')
-df_coef = df_coef.reset_index()
-df_coef = df_coef.rename(columns = {'index':'Variable_Names', 'logreg_coeff':'logregCV_coeff'})
-df_coef
-
-# plot ROC curve
-y_pred_prob = logistic.predict_proba(X_test)[:,1]
-
-fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-
-plt.plot([0, 1], [0, 1],'k--')
-plt.plot(fpr, tpr, label='Logistic Regression')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Decision Tree ROC Curve')
-plt.show();
-
-# calculate roc curve
-fpr, tpr, thresholds = roc_curve(y_test, logistic.predict(X_test))
-
-# roc auc score
-log_roc_auc = roc_auc_score(y_test, y_pred_prob)
-roc_auc_format = 'ROC AUC Score: {0:.4f}'.format(log_roc_auc)
-print(roc_auc_format)
-
-
-# predict on the test data X_test
-log_pred = logistic.predict(X_test)
-
-# returns the probability for both class labels
-logexport_prob = logistic.predict_proba(X_test) 
-
-#print confusion matrix for testing data
-print("Logistic Regression Model Testing Data Confusion Matrix :")
-print(confusion_matrix(y_test, log_pred_test)) 
-print('The accuracy score for the testing data is:', accuracy_testing.round(3))
+#Overall accuracy and ROC curve values are fairly strong. 88% accuracy and .94 ROC curve indicates we can be quite confident
+#in the predictors we have that predict a customer's satisfaction. That being said, we should explore removing
+#the variables that don't have as strong of a feature importance in order to have a more explainable model,
+#and potentially a better scoring model. We also need to look into alternate models to use, likely a neural net.
 
 
 
 '''
-#running LazyPredict regressor to get a sense of what other models should I look at
-reg = LazyRegressor(verbose=0,ignore_warnings=False, custom_metric=None )
-models_reg,predictions = reg.fit(X_train, X_test, y_train, y_test)
-print(models_reg)
-
 #running LazyPredict classifier to get a sense of what other models should I look at
 clf = LazyClassifier(verbose=0,ignore_warnings=True, custom_metric=None)
 models_clf,predictions = clf.fit(X_train, X_test, y_train, y_test)
-print(models_clf)'''
+print(models_clf)
+'''

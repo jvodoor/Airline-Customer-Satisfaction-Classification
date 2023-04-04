@@ -60,4 +60,4 @@ print(df_feat_eng.info()) #reduced to 120k values, still quite high and sufficie
 
 print ((df_feat_eng['Departure Delay in Minutes'] != 0).value_counts())
 
-df_feat_eng.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/df feat eng done.csv")
+df_feat_eng.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
