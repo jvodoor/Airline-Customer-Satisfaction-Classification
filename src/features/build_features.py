@@ -20,6 +20,14 @@ def df_encoding(df, column_name):
     df = df.drop(column_name, axis=1)
     return df
 
+def df_drop_many_cols(df, column_list):
+    df = df.drop(columns = column_list)
+    return df
+
+def df_drop_0_values(df, column_list):
+    for i in column_list:
+        df = df[df[i] != 0]
+    return df
 
 #not quite sure yet how to adapt this so when people try the code for thesmelves they'll be able to open the dataset without needing to change the filepath.
 df_feat_eng = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
