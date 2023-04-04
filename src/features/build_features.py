@@ -32,12 +32,32 @@ def df_drop_0_values(df, column_list):
 #not quite sure yet how to adapt this so when people try the code for thesmelves they'll be able to open the dataset without needing to change the filepath.
 df_feat_eng = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
 
-x, y = md.x_y_split(df_feat_eng, -1)
-df_feat_eng = df_encoding(df_feat_eng, "Gender")
-print(df_feat_eng.head())
+#changing categoricals to numerical values
+df_feat_eng = df_encoding(df_feat_eng, 'Gender') #0 = male, 1 = female
+df_feat_eng = df_encoding(df_feat_eng, 'Type of Travel') #0 = personal, 1 = business
+df_feat_eng = df_encoding(df_feat_eng, 'Class') #0 = eco plus, 1 = business, 2 = economy
+df_feat_eng = df_encoding(df_feat_eng, 'satisfaction') #0 = not satisfied, 1 = satisfied
+print(df_feat_eng.head(50))
+
+drop_cols = ['Customer Type', 'Arrival Delay in Minutes', 'id'] #Customer Type being dropped due to
+#vagueness of the column + badly spread data, Arrival Delay being dropped due to high correlation
+#with departure delay in minutes, id being dropped because it is not something that is
+#useful for modeling purposes
+
+df_feat_eng = df_drop_many_cols(df_feat_eng, drop_cols)
 print(df_feat_eng.info())
 
+#removing 0 values from our possible datapoints as mentioned in our visualization section
+drop_0_values = ['Inflight wifi service','Departure/Arrival time convenient', 
+                 'Ease of Online booking', 'Gate location', 'Food and drink',
+                   'Online boarding','Seat comfort', 'Inflight entertainment' ,
+                   'On-board service', 'Leg room service','Baggage handling', 
+                    'Checkin service', 'Inflight service', 'Cleanliness' ]
+df_feat_eng = df_drop_0_values(df_feat_eng, drop_0_values)
 
+print(df_feat_eng.describe())
+print(df_feat_eng.info()) #reduced to 120k values, still quite high and sufficient for our purposes
 
-#to be done: finish encoding our categoricals, eliminate Customer Type (disloyal/loyal), eliminate either departure or arrival delay time, potentially remove all 0 values from our survey data.
-#evaluate if this doesn't dilute our datapoints too much
+print ((df_feat_eng['Departure Delay in Minutes'] != 0).value_counts())
+
+df_feat_eng.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/df feat eng done.csv")

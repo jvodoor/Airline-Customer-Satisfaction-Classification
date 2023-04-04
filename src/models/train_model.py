@@ -1,36 +1,83 @@
 import sys
 sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/data/')
-sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/features/')
+sys.path.append("../src")
 import make_dataset as md
-import build_features as bf
 import pandas as pd
+import numpy as np
+import sklearn
+from sklearn.model_selection import train_test_split
+import statsmodels
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+from lazypredict.Supervised import LazyClassifier
+from lazypredict.Supervised import LazyRegressor
 
-df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
-df_train = bf.df_encoding(df_train, 'Gender') #0 = male, 1 = female
-df_train = bf.df_encoding(df_train, 'Type of Travel') #0 = personal, 1 = business
-df_train = bf.df_encoding(df_train, 'Class') #0 = eco plus, 1 = business, 2 = economy
-df_train = bf.df_encoding(df_train, 'satisfaction') #0 = not satisfied, 1 = satisfied
-print(df_train.head(50))
+df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/df feat eng done.csv")
 
-drop_cols = ['Customer Type', 'Arrival Delay in Minutes'] #Customer Type being dropped due to
-#vagueness of the column + badly spread data, Arrival Delay being dropped due to high correlation
-#with departure delay in minutes
+X, y = md.x_y_split(df_train, -1)
 
-df_train = bf.df_drop_many_cols(df_train, drop_cols)
-print(df_train.info())
+#80/20 train test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 21)
 
-#removing 0 values from our possible datapoints as mentioned in our visualization section
-drop_0_values = ['Inflight wifi service','Departure/Arrival time convenient', 
-                 'Ease of Online booking', 'Gate location', 'Food and drink',
-                   'Online boarding','Seat comfort', 'Inflight entertainment' ,
-                   'On-board service', 'Leg room service','Baggage handling', 
-                    'Checkin service', 'Inflight service', 'Cleanliness' ]
-df_train = bf.df_drop_0_values(df_train, drop_0_values)
+# fit initial model
+logistic = LogisticRegression(max_iter = 10000, random_state = 42)
+logistic.fit(X_train, y_train)
 
-print(df_train.describe())
-print(df_train.info()) #reduced to 120k values, still quite high and sufficient for our purposes
+# predict on the training data
+log_pred_train = logistic.predict(X_train)
+log_pred_test = logistic.predict(X_test)
+
+# display the inital model scores for training data
+accuracy_training = logistic.score(X_train, y_train)
+accuracy_testing = logistic.score(X_test, y_test)
+
+# display confusion matrix for testing data
+print("Logistic Regression Model Training Data Confusion Matrix :")
+print(confusion_matrix(y_train, log_pred_train)) 
+print('The accuracy score for the training data is:', accuracy_training.round(3), "\n")
+print("Logistic Regression Model Testing Data Confusion Matrix :")
+print(confusion_matrix(y_test, log_pred_test)) 
+print('The accuracy score for the testing data is:', accuracy_testing.round(3))
+
+log_intercept = logistic.intercept_ 
+beta_0 = log_intercept
+
+# extract log reg coefs
+coef = logistic.coef_[0]
+coef = np.array(coef)
+df_coef = pd.DataFrame(coef)
+df_coef = df_coef.T # transpose to match column names
+
+# column names
+names = X.columns
+df_coef.columns = names
+df_coef = df_coef.T # transpose for better view
+
+# sort coefficients in ascending order
+df_coef = df_coef.rename(columns = {0:'logregCV_coeff'})
+df_coef = df_coef.sort_values('logregCV_coeff')
+df_coef = df_coef.reset_index()
+df_coef = df_coef.rename(columns = {'index':'Variable_Names', 'logreg_coeff':'logregCV_coeff'})
+df_coef
 
 
-#X, Y = md.x_y_split(df_train, -1)
+# predict on the test data X_test
+log_pred = logistic.predict(X_test)
+
+# returns the probability for both class labels
+logexport_prob = logistic.predict_proba(X_test) 
 
 
+
+
+#running LazyPredict regressor to get a sense of what other models should I look at
+reg = LazyRegressor(verbose=0,ignore_warnings=False, custom_metric=None )
+models_reg,predictions = reg.fit(X_train, X_test, y_train, y_test)
+print(models_reg)
+
+#running LazyPredict classifier to get a sense of what other models should I look at
+clf = LazyClassifier(verbose=0,ignore_warnings=True, custom_metric=None)
+models_clf,predictions = clf.fit(X_train, X_test, y_train, y_test)
+print(models_clf)
