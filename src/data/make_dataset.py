@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 
 #function which will load initial dataset
 def load_dataset(file_path):
     return pd.read_csv(file_path, index_col = 0)
+
 
 #printing basic exploratory info for dataset, mainly to make sure the dataset loaded and prints correct ouput
 def print_df_preliminary_contents(data):

@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/Users/jvodo/DATA%204950/DATA-4950-Capstone/src/data/')
+#sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
 import make_dataset as md
 import pandas as pd
 import numpy as np
@@ -13,6 +13,7 @@ from lazypredict.Supervised import LazyClassifier
 from lazypredict.Supervised import LazyRegressor
 import matplotlib.pyplot as plt
 import train_model as tm
+import pickle
 
 def log_reg_predict(logistic, X_test, y_test):
     log_pred_test = logistic.predict(X_test)
@@ -61,3 +62,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 logistic_model = tm.log_reg_train(X_train, X_test, y_train, y_test)
 
 log_reg_predict(logistic_model, X_test, y_test) 
+
+
+nn_model = pickle.load(open('neural_net_model.pkl', 'rb'))
