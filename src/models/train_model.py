@@ -1,6 +1,13 @@
 import sys
-sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/data/')
-import make_dataset as md
+import path
+import os
+
+directory = path.Path(__file__).abspath()
+sys.path.insert(0, '/Users/jvodo/DATA%204950/DATA-4950-Capstone/src/data/')
+sys.path.append('/Users/jvodo/DATA%204950/DATA-4950-Capstone/src')
+#import make_dataset as md
+from  src.data import make_dataset as md
+#import src.data.make_dataset as md
 import pandas as pd
 import numpy as np
 import sklearn
@@ -62,9 +69,6 @@ X, y = md.x_y_split(df_train, -1)
 
 #80/20 train test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 21)
-
-
-#will functionalize the below code 
 
 logistic_model = log_reg_train(X_train, X_test, y_train, y_test)
 

@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/data/')
+sys.path.insert(0, '/Users/jvodo/DATA%204950/DATA-4950-Capstone/src/data/')
 import make_dataset as md
 import pandas as pd
 import numpy as np
@@ -60,4 +60,4 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 logistic_model = tm.log_reg_train(X_train, X_test, y_train, y_test)
 
-log_reg_predict(logistic_model, X_test, y_test)
+log_reg_predict(logistic_model, X_test, y_test) 

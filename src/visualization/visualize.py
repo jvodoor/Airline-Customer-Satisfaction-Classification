@@ -1,6 +1,6 @@
 import pandas as pd
 import sys
-sys.path.insert(0, '/Users/jvodo/DATA 4950/DATA-4950-Capstone/src/data/')
+sys.path.insert(0, '/Users/jvodo/DATA%204950/DATA-4950-Capstone/src/data/')
 import make_dataset as md
 import matplotlib.pyplot as plt
 import seaborn as sns
