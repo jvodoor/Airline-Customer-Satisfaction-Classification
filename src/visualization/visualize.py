@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 #load the dataset
-df_vis = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
+df_vis = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv") 
 md.print_df_preliminary_contents(df_vis)
 x, y = md.x_y_split(df_vis, -1)
 
