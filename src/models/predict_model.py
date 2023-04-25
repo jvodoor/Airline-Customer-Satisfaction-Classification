@@ -58,7 +58,7 @@ def log_reg_test_data_statistics(logistic, X_test, y_test):
 
 
 #load data set
-df_test = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df alt no gender.csv")
+df_test = md.load_dataset("/data/processed/df alt no gender.csv")
 
 #split data into Y target and X predictors
 X, y = md.x_y_split(df_test, -1)
