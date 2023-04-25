@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, roc_auc_score
+from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, roc_auc_score 
 
 import matplotlib.pyplot as plt
 import train_model as tm
