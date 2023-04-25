@@ -4,7 +4,7 @@ sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program
 import make_dataset as md
 
 
-#categoricals: Gender, Customer Type, Type of Travel, Class, Inflight Distance - Cleanliness
+#categoricals: Gender, Customer Type, Type of Travel, Class, Inflight Distance - Cleanliness 
 #Gender, Customer Type, Type of Travel, Satisfcation (y)
 
 #Function which creates ordinal encoded columns to be used on a categorical column. Each column will have a 1-z value representation,
