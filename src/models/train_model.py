@@ -1,27 +1,23 @@
 import sys
 import path
 #sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
-import make_dataset as md
 import pandas as pd
 import numpy as np
-import sklearn
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier, plot_tree
-import xgboost as xgb
-from sklearn.model_selection import cross_val_score, KFold, RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_curve, roc_auc_score
-import statsmodels as sm
+from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+import build_features as bf
+import make_dataset as md
+import pickle as pkl
 
 from lazypredict.Supervised import LazyClassifier
 from lazypredict.Supervised import LazyRegressor
 
 
-df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
-
-
+#function which performs model training based on the type specified, logistic regression or XGBoost
 def log_or_boost_train(X_train, X_test, y_train, log_or_boost):
     if log_or_boost == 'log':
         # fit initial model
@@ -29,12 +25,13 @@ def log_or_boost_train(X_train, X_test, y_train, log_or_boost):
         model.fit(X_train, y_train)
 
     if log_or_boost == 'boost':
-        xgbc = XGBClassifier(max_depth = 5 )
+        xgbc = XGBClassifier(max_depth = 5)
         model = xgbc.fit(X_train, y_train)
 
     return model 
 
 
+#function which outputs the performance scores for the type of model specified
 def log_or_tree_scores(model, X_train, y_train, log_or_tree):
     
     if log_or_tree == 'log':
@@ -47,6 +44,7 @@ def log_or_tree_scores(model, X_train, y_train, log_or_tree):
 
         # display confusion matrix for training data
         print("Logistic Regression Model Training Data Confusion Matrix :")
+        print("")
         print(confusion_matrix(y_train, log_pred_train), "\n") 
         print('The accuracy score for the training data is:', accuracy_training.round(3), "\n")
         
@@ -61,7 +59,8 @@ def log_or_tree_scores(model, X_train, y_train, log_or_tree):
 
         accuracy_training = model.score(X_train, y_train)
         # display confusion matrix for training data
-        print("XG Boost Model Training Data Confusion Matrix :")
+        print("XGBoosted Tree Model scores and tree plot:", "\n")
+        print("XG Boost Model Training Data Confusion Matrix :", "\n")
         print(confusion_matrix(y_train, xg_pred_train), "\n") 
         print('The accuracy score for the training data is:', accuracy_training.round(3), "\n")
 
@@ -70,7 +69,8 @@ def log_or_tree_scores(model, X_train, y_train, log_or_tree):
         plt.show()
         
 
-
+#function which displays the function importance for the respective model, and if it's a tree model, it will
+#also display the tree plot.
 def graph_coefs(model, X_data, log_or_tree):
     
     if log_or_tree == 'log':
@@ -94,7 +94,7 @@ def graph_coefs(model, X_data, log_or_tree):
         df_coef = df_coef.reset_index()
         df_coef = df_coef.rename(columns = {'index':'Variable_Names', 'logreg_coeff':'logregCV_coeff'})
         
-        
+        print("Logistic Regression Model scores:", "\n")
         # display barplot of log reg coefs
         plt.figure(figsize=(12, 8))
         plot = sns.barplot(x="Variable_Names",y="logregCV_coeff",data= df_coef, palette ="YlGnBu")
@@ -114,6 +114,7 @@ def graph_coefs(model, X_data, log_or_tree):
         df_feat_imp.columns = ['Importance', 'Features']
         df_feat_imp.sort_values('Importance', ascending = False)
 
+        print ("XGBoosted Tree feature importance:", "\n")
         Importance = pd.DataFrame({'Importance':model.feature_importances_*100}, index=names)
         Importance.sort_values('Importance', axis=0, ascending=True).plot(kind='barh', color='b')
         plt.xlabel('Variable Importance')
@@ -124,9 +125,8 @@ def graph_coefs(model, X_data, log_or_tree):
     print ("\n")
 
 
-
-
-
+#load dataset
+df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
 
 #split dataset into X df featuring every column but target, and y which is just the target
 X, y = md.x_y_split(df_train, -1)
@@ -136,7 +136,9 @@ X, y = md.x_y_split(df_train, -1)
 #df 80/20 train test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 21)
 
+
 #logistic regression
+print ("Logistic Regression Model with all predictors after initial Feature Engineering:", "\n")
 logistic_model = log_or_boost_train(X_train, X_test, y_train, 'log')
 log_or_tree_scores(logistic_model, X_train, y_train, 'log')
 graph_coefs(logistic_model, X, 'log')
@@ -146,10 +148,11 @@ graph_coefs(logistic_model, X, 'log')
 #the variables that don't have as strong of a feature importance in order to have a more explainable model,
 #and potentially a better scoring model. Our alternative approach will be using an XGBoostCLassifier Tree model.
 
+
 #XGBoost Tree classifier
+print ("XGBoosted Tree Model with all predictors after initial Feature Engineering:", "\n")
 xg_model = log_or_boost_train(X_train, X_test, y_train, 'boost')
 log_or_tree_scores(xg_model, X_train, y_train, 'tree')
-
 graph_coefs(xg_model, X, 'tree')
 
 
@@ -172,15 +175,18 @@ df_no_gender = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data
 #split dataset into X df featuring every column but target, and y which is just the target
 no_gender_X, no_gender_y = md.x_y_split(df_no_gender, -1)
 
+
 #df 80/20 train test split
 no_gender_X_train, no_gender_X_test, no_gender_y_train, no_gender_y_test = train_test_split(no_gender_X, no_gender_y, test_size = 0.2, random_state = 21)
 
 #logistic regression without gender
+print ("Logistic Regression Model with gender removed:", "\n")
 no_gender_logistic = log_or_boost_train(no_gender_X_train, no_gender_X_test, no_gender_y_train, 'log')
 log_or_tree_scores(no_gender_logistic, no_gender_X_train, no_gender_y_train, 'log')
 graph_coefs(no_gender_logistic, no_gender_X, 'log')
 
 #XGBoost Tree classifier without gender
+print ("XGBoosted Tree Model with gender removed:", "\n")
 no_gender_xg_model = log_or_boost_train(no_gender_X_train, no_gender_X_test, no_gender_y_train, 'boost')
 log_or_tree_scores(no_gender_xg_model, no_gender_X_train, no_gender_y_train, 'tree')
 graph_coefs(no_gender_xg_model, no_gender_X, 'tree')
@@ -192,7 +198,58 @@ graph_coefs(no_gender_xg_model, no_gender_X, 'tree')
 #given how Gender as it is is not an important feature, I do not expect there to be further bias as a result
 #of its inclusion or exclusion. To be safe, we can continue with the removal of it. 
 
- 
+#let's also eliminate some of our bottom scoring features with respect to each model and see how the model changes
+
+print("----------------------------------------------------------------")
+drop_log_cols = ['Gate location', 'Food and drink', 'Departure Delay in Minutes', 'Flight Distance',
+                 'Age', 'Inflight service', 'Seat comfort', 'Baggage handling', 'Cleanliness'] 
+                #dropping until the 10 highest predictors remain
+df_reduced_log = bf.df_drop_many_cols(df_no_gender, drop_log_cols)
+
+drop_tree_cols = ['Seat comfort', 'Baggage handling', 'Inflight service', 'Ease of Online booking',
+                    'Food and drink', 'Age', 'Flight Distance', 'Departure/Arrival time convenient', 
+                    'Departure Delay in Minutes'] #dropping until the 10 highest predictors remain
+df_reduced_tree = bf.df_drop_many_cols(df_no_gender, drop_tree_cols)
+
+
+#split dataset into X df featuring every column but target, and y which is just the target
+reduced_log_X, reduced_log_y = md.x_y_split(df_reduced_log, -1)
+reduced_tree_X, reduced_tree_y = md.x_y_split(df_reduced_tree, -1)
+
+#df 80/20 train test split
+reduced_log_X_train, reduced_log_X_test, reduced_log_y_train, reduced_log_y_test = train_test_split( reduced_log_X, reduced_log_y, test_size = 0.2, random_state = 21)
+
+reduced_tree_X_train, reduced_tree_X_test, reduced_tree_y_train, reduced_tree_y_test = train_test_split( reduced_tree_X, reduced_tree_y, test_size = 0.2, random_state = 21)
+
+
+#logistic regression with reduced predictors
+print ("Logistic Regression Model with Top 10 important predictors only:")
+print("")
+reduced_logistic = log_or_boost_train(reduced_log_X_train, reduced_log_X_test, reduced_log_y_train, 'log')
+log_or_tree_scores(reduced_logistic, reduced_log_X_train, reduced_log_y_train, 'log')
+graph_coefs(reduced_logistic, reduced_log_X, 'log')
+
+
+#XGBoost Tree classifier with reduced predictors
+print ("XGBoosted Tree Model with Top 10 important predictors only:")
+print("")
+reduced_xg_model = log_or_boost_train(reduced_tree_X_train, reduced_tree_X_test, reduced_tree_y_train, 'boost')
+log_or_tree_scores(reduced_xg_model, reduced_tree_X_train, reduced_tree_y_train, 'tree')
+graph_coefs(reduced_xg_model, reduced_tree_X, 'tree')
+
+
+#Overall accuracy numbers are minimally brought down once again, but we have much more explainable models.
+#I will be keeping these final predictors.
+
+#saving the model to load in predictions
+pkl.dump(reduced_logistic, open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/logistic_train.pkl', 'wb'))
+pkl.dump(reduced_xg_model, open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/xg_train.pkl', 'wb'))        
+
+
+#saving final data sets for predict model evaluation
+df_reduced_log.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data log model.csv")
+df_reduced_tree.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data tree model.csv")
+
 
 #running LazyPredict classifier to get a sense of what other models should I look at
 #clf = LazyClassifier(verbose=0,ignore_warnings=True, custom_metric=None)

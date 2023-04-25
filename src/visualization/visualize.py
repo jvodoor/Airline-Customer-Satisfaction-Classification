@@ -5,6 +5,7 @@ import make_dataset as md
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+#load the dataset
 df_vis = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
 md.print_df_preliminary_contents(df_vis)
 x, y = md.x_y_split(df_vis, -1)
@@ -117,49 +118,3 @@ print("non zero arrival delays", df_vis['Arrival Delay in Minutes'].astype(bool)
 
 
 
-
-
-
-
-
-
-
-
-# This is exploring how to make a sequence of scrollable graphs, doesn't work yet, need
-#to do more research.
-'''
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
-
-# create a list of graph objects
-graphs = []
-for i in range(5):
-    fig, ax = plt.subplots()
-    ax.plot([1, 2, 3], [i+1, i+2, i+3])
-    graphs.append(fig)
-
-# create a figure to hold the navigation buttons
-fig_nav = plt.figure()
-ax_prev = plt.axes([0.7, 0.05, 0.1, 0.075])
-ax_next = plt.axes([0.81, 0.05, 0.1, 0.075])
-btn_prev = Button(ax_prev, 'Prev')
-btn_next = Button(ax_next, 'Next')
-
-# define the callback functions for the navigation buttons
-def prev(event):
-    plt.close(graphs[i])
-    i = (i - 1) % len(graphs)
-    graphs[i].show()
-
-def next(event):
-    plt.close(graphs[i])
-    i = (i + 1) % len(graphs)
-    graphs[i].show()
-
-# connect the navigation buttons to their callback functions
-btn_prev.on_clicked(prev)
-btn_next.on_clicked(next)
-
-# show the first graph in the sequence
-i = 0
-graphs[i].show()'''

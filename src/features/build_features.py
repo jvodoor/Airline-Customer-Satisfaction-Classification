@@ -30,7 +30,7 @@ def df_drop_0_values(df, column_list):
         df = df[df[i] != 0]
     return df
 
-#not quite sure yet how to adapt this so when people try the code for thesmelves they'll be able to open the dataset without needing to change the filepath.
+#load the dataset
 df_feat_eng = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
 
 #changing categoricals to numerical values
