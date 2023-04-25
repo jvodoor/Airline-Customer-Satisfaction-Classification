@@ -34,12 +34,11 @@ def x_y_split (df1, column_axis):
 df_old_train = load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/train.csv")
 df_old_test = load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/test.csv")
 
-print_df_preliminary_contents(df_old_train)
-print_df_preliminary_contents(df_old_test)
+
 df = merge_data(df_old_train,df_old_test)
-print_df_preliminary_contents(df)
+
 
 #dropped nulls for our first pass of a cleaned up data set
 df = df.dropna()
-print_df_preliminary_contents(df)
+
 df.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
