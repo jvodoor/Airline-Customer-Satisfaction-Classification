@@ -1,6 +1,9 @@
 import sys
 import path
-#sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
+
+#path to add in directories to call other files and their functions
+sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
+
 import make_dataset as md 
 import pandas as pd
 import numpy as np
@@ -16,6 +19,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow.keras as keras
 import pickle
+import os
 
 
 def neural_net_train(X_train, X_test, y_train, y_test, n_hidden_units, n_hidden_layers):
@@ -36,7 +40,7 @@ def neural_net_train(X_train, X_test, y_train, y_test, n_hidden_units, n_hidden_
                     loss=keras.losses.SparseCategoricalCrossentropy(), 
                      metrics=keras.metrics.SparseCategoricalAccuracy())
             
-    keras.utils.plot_model(model,show_shapes=True,expand_nested=True)
+    keras.utils.plot_model(model,show_shapes=True,expand_nested=True) #will show up as a png file
     return model 
 
 def evaluate_model (nn_model, X_train, y_train, X_test, y_test, n_epochs, num_batch):
@@ -48,9 +52,14 @@ def evaluate_model (nn_model, X_train, y_train, X_test, y_test, n_epochs, num_ba
                                                     validation_data=(X_test,y_test))
     print(nn_model.evaluate(X_test,y_test))
 
+#opening file paths for users to load in datasets. File path points to default home directory of project folder.
+#Home directory = "Data-4950-Capstone" project folder. If your datasets are in another folder, you must modify this
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, '..', '..')
+
 
 #not using a dataframe in a neural net, but using this with existing functions to get our separated data
-df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
+df_train = md.load_dataset(file_path + "/data/processed/df feat eng done.csv")
 
 
 #split dataset into X df featuring every column but target, and y which is just the target
@@ -87,5 +96,5 @@ but it would require a lot of research and analysis of fairly experimental metho
 are more well defined in nature. This is out of the scope of my knowledge, but I do hope to one day return and
 try to use some of those methods I discovered.
 
-I will leave this code in as proof of concept for a neural net architecture, but it will not serve as my alternative model.
+I will leave this code in as proof of concept for a neural net architecture, but it will not serve as an alternative model.
 '''

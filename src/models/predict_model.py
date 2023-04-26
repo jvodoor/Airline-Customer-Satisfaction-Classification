@@ -1,12 +1,15 @@
 import sys
-#sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\models']
+
+#path to add in directories to call other files and their functions
+sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\models']
+
 import make_dataset as md
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, roc_auc_score 
-
+import os
 import matplotlib.pyplot as plt
 import train_model as tm
 import pickle as pkl
@@ -51,10 +54,14 @@ def log_reg_test_data_statistics(logistic, X_test, y_test, model):
     roc_auc_format = 'ROC AUC Score: {0:.4f}'.format(log_roc_auc)
     print(roc_auc_format)
 
+#opening file paths for users to load in datasets. File path points to default home directory of project folder.
+#Home directory = "Data-4950-Capstone" project folder. If your datasets are in another folder, you must modify this
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, '..', '..')
 
 #load data set
-df_final_log_data = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data log model.csv")
-df_final_tree_data = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data tree model.csv")
+df_final_log_data = md.load_dataset(file_path + "/data/processed/final data log model.csv")
+df_final_tree_data = md.load_dataset(file_path + "/data/processed/final data tree model.csv")
 
 #split data into Y target and X predictors
 log_X, log_y = md.x_y_split(df_final_log_data, -1)
@@ -66,8 +73,8 @@ log_X_train, log_X_test, log_y_train, log_y_test = train_test_split(log_X, log_y
 tree_X_train, tree_X_test, tree_y_train, tree_y_test = train_test_split(tree_X, tree_y, test_size = 0.2, random_state = 21)
 
 #load picked models
-logistic_model = pkl.load(open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/logistic_train.pkl', 'rb'))
-tree_model = pkl.load(open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/xg_train.pkl', 'rb'))
+logistic_model = pkl.load(open(file_path + '/models/logistic_train.pkl', 'rb'))
+tree_model = pkl.load(open(file_path + '/models/xg_train.pkl', 'rb'))
 
 #logistic regression test statistics
 log_reg_test_data_statistics(logistic_model, log_X_test, log_y_test, "Logistic Regression") 
