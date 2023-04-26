@@ -1,6 +1,9 @@
 import sys
 import path
-#sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
+
+#path to add in directories to call other files and their functions
+sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -12,9 +15,10 @@ import seaborn as sns
 import build_features as bf
 import make_dataset as md
 import pickle as pkl
+import os
 
 from lazypredict.Supervised import LazyClassifier
-from lazypredict.Supervised import LazyRegressor
+
 
 
 #function which performs model training based on the type specified, logistic regression or XGBoost
@@ -125,8 +129,13 @@ def graph_coefs(model, X_data, log_or_tree):
     print ("\n")
 
 
+#opening file paths for users to load in datasets. File path points to default home directory of project folder.
+#Home directory = "Data-4950-Capstone" project folder. If your datasets are in another folder, you must modify this
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, '..', '..')
+
 #load dataset
-df_train = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
+df_train = md.load_dataset(file_path + "/data/processed/df feat eng done.csv")
 
 #split dataset into X df featuring every column but target, and y which is just the target
 X, y = md.x_y_split(df_train, -1)
@@ -170,7 +179,7 @@ graph_coefs(xg_model, X, 'tree')
 
 print("----------------------------------------------------------------")
 
-df_no_gender = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df alt no gender.csv")
+df_no_gender = md.load_dataset(file_path + "/data/processed/df alt no gender.csv")
 
 #split dataset into X df featuring every column but target, and y which is just the target
 no_gender_X, no_gender_y = md.x_y_split(df_no_gender, -1)
@@ -242,16 +251,18 @@ graph_coefs(reduced_xg_model, reduced_tree_X, 'tree')
 #I will be keeping these final predictors.
 
 #saving the model to load in predictions
-pkl.dump(reduced_logistic, open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/logistic_train.pkl', 'wb'))
-pkl.dump(reduced_xg_model, open('C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/models/xg_train.pkl', 'wb'))        
+pkl.dump(reduced_logistic, open(file_path + '/models/logistic_train.pkl', 'wb'))
+pkl.dump(reduced_xg_model, open(file_path + '/models/xg_train.pkl', 'wb'))        
 
 
 #saving final data sets for predict model evaluation
-df_reduced_log.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data log model.csv")
-df_reduced_tree.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/final data tree model.csv")
+df_reduced_log.to_csv(file_path + "/data/processed/final data log model.csv")
+df_reduced_tree.to_csv(file_path + "/data/processed/final data tree model.csv")
 
 
-#running LazyPredict classifier to get a sense of what other models should I look at
+#running LazyPredict classifier to get a sense of what other models should I look at. It takes awhile to load
+#so it is commented out, but the results are in the folder.
+
 #clf = LazyClassifier(verbose=0,ignore_warnings=True, custom_metric=None)
 #models_clf,predictions = clf.fit(X_train, X_test, y_train, y_test)
 #print(models_clf)

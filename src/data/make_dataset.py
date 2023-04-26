@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+import os
 
 #function which will load initial dataset
 def load_dataset(file_path):
@@ -31,14 +32,23 @@ def x_y_split (df1, column_axis):
     x = df1.drop(df1.iloc[:,-1:], axis = 1)
     return x,y
 
-df_old_train = load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/train.csv")
-df_old_test = load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/test.csv")
+
+#opening file paths for users to load in datasets. File path points to default home directory of project folder.
+#Home directory = "Data-4950-Capstone" project folder. If your datasets are in another folder, you must modify this
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, '..', '..')
 
 
+#load datasets
+df_old_train = load_dataset(file_path + "/data/external/train.csv")
+df_old_test = load_dataset(file_path + "/data/external/test.csv")
+
+#merge data
 df = merge_data(df_old_train,df_old_test)
 
 
 #dropped nulls for our first pass of a cleaned up data set
 df = df.dropna()
 
-df.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
+#save as dataset for feature engineering
+df.to_csv(file_path + "/data/external/comb df clean.csv")

@@ -1,8 +1,10 @@
 import pandas as pd
 import sys
-sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
 import make_dataset as md
+import os
 
+#path to add in directories to call other files and their functions
+sys.path = ['c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src', 'c:\\Program Files\\Python311\\python311.zip', 'c:\\Program Files\\Python311\\DLLs', 'c:\\Program Files\\Python311\\Lib', 'c:\\Program Files\\Python311', '', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\win32\\lib', 'C:\\Users\\jvodo\\AppData\\Roaming\\Python\\Python311\\site-packages\\Pythonwin', 'c:\\Program Files\\Python311\\Lib\\site-packages', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\data', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\features', 'c:\\Users\\jvodo\\DATA 4950\\DATA-4950-Capstone\\src\\models']
 
 #categoricals: Gender, Customer Type, Type of Travel, Class, Inflight Distance - Cleanliness 
 #Gender, Customer Type, Type of Travel, Satisfcation (y)
@@ -30,8 +32,12 @@ def df_drop_0_values(df, column_list):
         df = df[df[i] != 0]
     return df
 
+#opening file paths for users to load in datasets
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, '..', '..') 
+
 #load the dataset
-df_feat_eng = md.load_dataset("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/external/comb df clean.csv")
+df_feat_eng = md.load_dataset(file_path + "/data/external/comb df clean.csv")
 
 #changing categoricals to numerical values
 df_feat_eng = df_encoding(df_feat_eng, 'Gender') #0 = male, 1 = female
@@ -61,11 +67,13 @@ print(df_feat_eng.info()) #reduced to 120k values, still quite high and sufficie
 
 print ((df_feat_eng['Departure Delay in Minutes'] != 0).value_counts())
 
-df_feat_eng.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df feat eng done.csv")
+#export to processed dataset folder
+df_feat_eng.to_csv(file_path + "/data/processed/df feat eng done.csv")
 
-
+#making a dataset without gender as a predictor
 gender_drop_cols = ['Gender Ordinal']
 df_alt_no_gender = df_feat_eng
 df_alt_no_gender = df_drop_many_cols(df_alt_no_gender, gender_drop_cols)
 
-df_alt_no_gender.to_csv("C:/Users/jvodo/DATA 4950/DATA-4950-Capstone/data/processed/df alt no gender.csv")
+#export to processed dataset folder
+df_alt_no_gender.to_csv(file_path + "/data/processed/df alt no gender.csv")
