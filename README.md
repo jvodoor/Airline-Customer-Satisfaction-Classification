@@ -1,4 +1,4 @@
-DATA 4950 Capstone Project
+Predicting Airline Customer Satisfaction
 ==============================
 
 This Project analyzes various data points surrounding the customer satisfaction of an airline customer. Using customer survey data, can we predict who is more likely to be a satisfied customer and derive insights for airline companies?
